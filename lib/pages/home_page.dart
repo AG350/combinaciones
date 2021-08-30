@@ -1,44 +1,53 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:formas_colores/models/models.dart';
 import 'package:formas_colores/provider/data_provider.dart';
 import 'package:formas_colores/widgets/widgets.dart';
 
+Random random = new Random();
+double randomNumber = random.nextDouble();
+
 // ignore: must_be_immutable
 class HomePage extends StatelessWidget {
   static final routeName = 'home';
   late CombinacionModel combinacionStream;
+  static late double base = 0.3;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: SingleChildScrollView(
-          child: StreamBuilder(
-            stream: CombinacionesProvider.seleccionStreamController,
-            initialData: CombinacionesProvider.combinacionSeleccionada,
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              if (snapshot.hasData) {
-                combinacionStream = snapshot.data;
-              }
-              return Container(
-                child: Center(
-                  child: Container(
-                    width: double.infinity,
-                    height: 600,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        FormularioSeleccion(),
-                        FormasSelector(
-                          forma: combinacionStream.forma.descripcion,
-                          color: combinacionStream.color.color,
-                        )
-                      ],
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: SingleChildScrollView(
+            child: StreamBuilder(
+              stream: CombinacionesProvider.seleccionStreamController,
+              initialData: CombinacionesProvider.combinacionSeleccionada,
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData) {
+                  combinacionStream = snapshot.data;
+                }
+                return Container(
+                  child: Center(
+                    child: Container(
+                      width: double.infinity,
+                      height: 600,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          FormularioSeleccion(),
+                          FormasSelector(
+                            forma: combinacionStream.forma.descripcion,
+                            color: combinacionStream.color.color,
+                            base: base,
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ),
       ),
@@ -73,6 +82,7 @@ class _FormularioSeleccionState extends State<FormularioSeleccion> {
                 if (value != null) {
                   CombinacionesProvider.combinacionSeleccionada.color = value;
                   CombinacionesProvider.formulario();
+                  HomePage.base = randomNumber;
                   setState(() {});
                 }
               },
@@ -95,6 +105,7 @@ class _FormularioSeleccionState extends State<FormularioSeleccion> {
               controller: this.nombreController,
               onChanged: (value) {
                 CombinacionesProvider.combinacionSeleccionada.descripcion = value;
+                setState(() {});
               },
             ),
             SizedBox(height: 20),
@@ -102,11 +113,14 @@ class _FormularioSeleccionState extends State<FormularioSeleccion> {
               text: 'Combinar',
               onPress: () {
                 if (this.nombreController.text != '') {
-                  CombinacionesProvider.combinacionSeleccionada!.descripcion = this.nombreController.text;
-                  print('${CombinacionesProvider.combinacionSeleccionada.color} + ${this.nombreController.text}');
-                  dp.combinar();
+                  CombinacionesProvider.combinacionSeleccionada.descripcion = this.nombreController.text;
+                  //dp.combinar();
+                  CombinacionesProvider().cargarCombinaciones();
+                  Navigator.pushReplacementNamed(context, 'combinaciones');
                 }
+                CombinacionesProvider().cargarCombinaciones();
                 Navigator.pushReplacementNamed(context, 'combinaciones');
+                //Navigator.pushReplacementNamed(context, 'combinaciones');
                 setState(() {});
               },
             )

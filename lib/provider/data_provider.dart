@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ffi';
 
 import 'package:formas_colores/data/local_data.dart';
 import 'package:formas_colores/models/models.dart';
@@ -30,19 +29,19 @@ class CombinacionesProvider {
   static final StreamController<CombinacionModel> _seleccionStreamController = new StreamController.broadcast();
 
   static Stream<CombinacionModel> get seleccionStreamController => _seleccionStreamController.stream;
+  static Stream<List<CombinacionModel>> get combinacionesStreamController => _combinacionesStreamController.stream;
 
   static void formulario() {
     _seleccionStreamController.add(combinacionSeleccionada);
   }
 
-  void combinar() {
-    db.guardaCombinacion(combinacionSeleccionada);
+  void combinar() async {
+    await db.guardaCombinacion(combinacionSeleccionada);
     cargarCombinaciones();
   }
 
   void cargarCombinaciones() async {
     listadoCombinaciones = await db.obtenerListaCombinaciones();
-    print(combinacionSeleccionada.descripcion);
     _combinacionesStreamController.add(listadoCombinaciones);
   }
 

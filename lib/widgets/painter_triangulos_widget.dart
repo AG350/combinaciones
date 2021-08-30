@@ -2,19 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-
-
 class PainterTrianguloWidget extends StatelessWidget {
   final String color;
+  final double base;
 
-  const PainterTrianguloWidget({required this.color});
+  const PainterTrianguloWidget({required this.color, required this.base});
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       width: 300,
       child: CustomPaint(
-        painter: _TrianguloPainter(color),
+        painter: _TrianguloPainter(color, base),
       ),
     );
   }
@@ -22,8 +21,9 @@ class PainterTrianguloWidget extends StatelessWidget {
 
 class _TrianguloPainter extends CustomPainter {
   final String color;
+  final double base;
 
-  _TrianguloPainter(this.color);
+  _TrianguloPainter(this.color, this.base);
   @override
   void paint(Canvas canvas, Size size) {
     final paint = new Paint();
@@ -35,9 +35,9 @@ class _TrianguloPainter extends CustomPainter {
     final path = new Path();
 
     // Dibujar con path y paint
-    path.moveTo(size.width * 0.25, size.height * 0.4);
-    path.lineTo(size.width * 0.5, size.height * 0.2);
-    path.lineTo(size.width * 0.75, size.height * 0.4);
+    path.moveTo(size.width * 0.25, size.height * base);
+    path.lineTo(size.width * 0.5, size.height * base);
+    path.lineTo(size.width * 0.75, size.height * (1.0 - base));
 
     canvas.drawPath(path, paint);
   }
@@ -97,15 +97,16 @@ class _CuadradoPainter extends CustomPainter {
 
 class PainterCirculoWidget extends StatelessWidget {
   final String color;
+  final double base;
 
-  const PainterCirculoWidget({required this.color});
+  const PainterCirculoWidget({required this.color, required this.base});
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       width: 300,
       child: CustomPaint(
-        painter: _CirculoPainter(color),
+        painter: _CirculoPainter(color, base),
       ),
     );
   }
@@ -113,8 +114,9 @@ class PainterCirculoWidget extends StatelessWidget {
 
 class _CirculoPainter extends CustomPainter {
   final String color;
+  final double base;
 
-  _CirculoPainter(this.color);
+  _CirculoPainter(this.color, this.base);
   @override
   void paint(Canvas canvas, Size size) {
     final paint = new Paint();
@@ -124,7 +126,7 @@ class _CirculoPainter extends CustomPainter {
     paint.strokeWidth = 2;
 
     Offset center = new Offset(size.width * 0.5, size.height * 0.5);
-    double radius = min(size.width * 0.22, size.height * 0.2);
+    double radius = min(size.width * base / 3, size.height * base);
 
     canvas.drawCircle(center, radius, paint);
   }

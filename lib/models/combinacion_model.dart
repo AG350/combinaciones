@@ -26,7 +26,7 @@ class CombinacionModel {
         color: ColorModel.fromJson(json["colores"]),
         forma: FormaModel.fromJson(json["formas"]),
         descripcion: json["descripcion"],
-        idFirebase: json["idFirebase"] ?? null,
+        idFirebase: json["idFirebase"] == null ? null : json["idFirebase"],
       );
 
   Map<String, dynamic> toMap() => {
@@ -34,6 +34,6 @@ class CombinacionModel {
         "colores": color.toMap(),
         "formas": forma.toMap(),
         "descripcion": descripcion,
-        "idFirebase": idFirebase ?? null,
+        "idFirebase": idFirebase == '' ? '' : idFirebase,
       };
 }

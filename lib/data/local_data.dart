@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:formas_colores/models/color_model.dart';
 import 'package:formas_colores/models/combinacion_model.dart';
 import 'package:formas_colores/models/forma_model.dart';
+import 'package:formas_colores/provider/data_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
@@ -38,7 +39,7 @@ class Dbase {
             idColor TEXT,
             idForma TEXT, 
             descripcion TEXT, 
-            idFirebase TEXT DEFAULT ''
+            idFirebase TEXT
             )''');
       },
     );
@@ -46,7 +47,7 @@ class Dbase {
 
   Future<bool> guardaCombinacion(CombinacionModel combinacion) async {
     final _combinacion = await obtenerCombinacion(combinacion);
-    if (_combinacion.id != null) {
+    if (_combinacion?.id != null) {
       final res = await _modificaCombinacion(combinacion);
       if (res > 0) return true;
     } else {
@@ -62,11 +63,11 @@ class Dbase {
     try {
       final db = await database;
       res = await db.rawInsert('''
-      INSERT INTO Combinaciones( idColor, idForma, descripcion) 
-      VALUES ( '${combinacion.color.id}','${combinacion.forma.id}', '${combinacion.descripcion}')
+      INSERT INTO Combinaciones( id, idColor, idForma, descripcion, idFirebase) 
+      VALUES ( null, '${combinacion.color.id}','${combinacion.forma.id}', '${combinacion.descripcion}', null)
     ''');
     } catch (errorsql) {
-      print(errorsql.toString());
+      print('error de bd AC: ${errorsql.toString()}');
     } finally {}
     return res;
   }
@@ -80,38 +81,41 @@ class Dbase {
         res = await db.update('Usuarios', combinacionModel.toMap(), where: 'id = ?', whereArgs: [combinacionModel.id]);
       }
     } catch (errorsql) {
-      print(errorsql.toString());
+      print('error de bd MC: ${errorsql.toString()}');
     }
     return res;
   }
 
-  Future<CombinacionModel> obtenerCombinacion(CombinacionModel combinacionModel) async {
-    CombinacionModel combinacionRes = new CombinacionModel(
-      color: new ColorModel(color: '', descripcionColor: '', id: ''),
-      forma: new FormaModel(descripcion: '', id: ''),
-      descripcion: '',
-    );
+  Future<CombinacionModel?> obtenerCombinacion(CombinacionModel combinacionModel) async {
     try {
-      final db = await database;
-      final res = await db
-          .query('Combinaciones', where: 'idColor = ? and idForma = ?', whereArgs: [combinacionModel.color.id, combinacionModel.forma.id]);
-      if (res.isNotEmpty) combinacionRes = CombinacionModel.fromMap(res.first);
+      if (combinacionModel.id != null) {
+        final db = await database;
+        final res = await db.query('Combinaciones', where: 'id = ?', whereArgs: [combinacionModel.id]);
+        if (res.isNotEmpty) return convertResponse(res);
+      }
     } catch (errorsql) {
-      print(errorsql.toString());
+      print('error de bd OC: ${errorsql.toString()}');
     } finally {}
-
-    return combinacionRes;
   }
 
   Future<List<CombinacionModel>> obtenerListaCombinaciones() async {
     List<CombinacionModel> lstCombinaciones = [];
     try {
       final db = await database;
-      final res = await db.query('Combinaciones', orderBy: 'descripcion');
-      lstCombinaciones = (res.isNotEmpty) ? res.map((item) => CombinacionModel.fromMap(item)).toList() : [];
+      final res = await db.query('Combinaciones');
+      lstCombinaciones = (res.isNotEmpty) ? res.map((item) => convertResponse(item)).toList() : [];
     } catch (errorsql) {
-      print(errorsql.toString());
+      print('error de bd OLC: ${errorsql.toString()}');
     } finally {}
     return lstCombinaciones;
   }
+}
+
+CombinacionModel convertResponse(dynamic res) {
+  print('Funcion: ${res["id"]} ${res["idColor"]} ${res["idForma"]} ${res["descripcion"]} ${res["idFirebase"]}');
+  final ColorModel colorModel = CombinacionesProvider().colores.firstWhere((element) => element.id == res["idColor"]);
+  final FormaModel formaModel = CombinacionesProvider().formas.firstWhere((element) => element.id == res["idForma"]);
+  final String descripcion = res["descripcion"].toString();
+  final String idFirebase = res["idFirebase"] == null ? '' : res["idFirebase"];
+  return CombinacionModel(id: res["id"], color: colorModel, forma: formaModel, descripcion: descripcion, idFirebase: idFirebase);
 }
