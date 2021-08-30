@@ -2,25 +2,33 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+
+
 class PainterTrianguloWidget extends StatelessWidget {
+  final String color;
+
+  const PainterTrianguloWidget({required this.color});
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       width: 300,
       child: CustomPaint(
-        painter: _TrianguloPainter(),
+        painter: _TrianguloPainter(color),
       ),
     );
   }
 }
 
 class _TrianguloPainter extends CustomPainter {
+  final String color;
+
+  _TrianguloPainter(this.color);
   @override
   void paint(Canvas canvas, Size size) {
     final paint = new Paint();
     //propiedades
-    paint.color = Color(0xff615AAB);
+    paint.color = Color(int.parse("0xFF" + color));
     paint.style = PaintingStyle.fill;
     paint.strokeWidth = 2;
 
@@ -41,34 +49,42 @@ class _TrianguloPainter extends CustomPainter {
 }
 
 class PainterCuadradoWidget extends StatelessWidget {
+  final String color;
+  final double base;
+
+  const PainterCuadradoWidget({required this.color, required this.base});
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       width: 300,
       child: CustomPaint(
-        painter: _CuadradoPainter(),
+        painter: _CuadradoPainter(color, base),
       ),
     );
   }
 }
 
 class _CuadradoPainter extends CustomPainter {
+  final String color;
+  final double base;
+
+  _CuadradoPainter(this.color, this.base);
   @override
   void paint(Canvas canvas, Size size) {
     final paint = new Paint();
     //propiedades
-    paint.color = Color(0xff615AAB);
+    paint.color = Color(int.parse("0xFF" + color));
     paint.style = PaintingStyle.fill;
     paint.strokeWidth = 2;
 
     final path = new Path();
 
     // Dibujar con path y paint
-    path.moveTo(size.width * 0.25, size.height * 0.4);
-    path.lineTo(size.width * 0.25, size.height * 0.2);
-    path.lineTo(size.width * 0.75, size.height * 0.2);
-    path.lineTo(size.width * 0.75, size.height * 0.4);
+    path.moveTo(size.width * base, size.height * base);
+    path.lineTo(size.width * base, size.height * 0.2);
+    path.lineTo(size.width * (1 - base), size.height * 0.2);
+    path.lineTo(size.width * (1 - base), size.height * base);
 
     canvas.drawPath(path, paint);
   }
@@ -79,25 +95,31 @@ class _CuadradoPainter extends CustomPainter {
   }
 }
 
-class PainterRedondoWidget extends StatelessWidget {
+class PainterCirculoWidget extends StatelessWidget {
+  final String color;
+
+  const PainterCirculoWidget({required this.color});
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 300,
       width: 300,
       child: CustomPaint(
-        painter: _RedondoPainter(),
+        painter: _CirculoPainter(color),
       ),
     );
   }
 }
 
-class _RedondoPainter extends CustomPainter {
+class _CirculoPainter extends CustomPainter {
+  final String color;
+
+  _CirculoPainter(this.color);
   @override
   void paint(Canvas canvas, Size size) {
     final paint = new Paint();
     //propiedades
-    paint.color = Color(0xff615AAB);
+    paint.color = Color(int.parse("0xFF" + color));
     paint.style = PaintingStyle.fill;
     paint.strokeWidth = 2;
 
