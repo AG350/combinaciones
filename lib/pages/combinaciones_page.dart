@@ -8,19 +8,53 @@ class CombinacionesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Combinaciones'),
-        actions: [
-          IconButton(
-              onPressed: null,
-              icon: Icon(
-                Icons.sync_rounded,
-                color: Colors.white,
-              ))
-        ],
+      appBar: AppBar(title: Text('Combinaciones'), actions: [Sincronizar()]),
+      body: SafeArea(child: Body()),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushReplacementNamed(context, 'home'),
+        child: Icon(Icons.home),
       ),
-      body: SafeArea(
-        child: Body(),
+    );
+  }
+}
+
+class Sincronizar extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      iconSize: 25,
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            elevation: 0,
+            title: Text('Sincronizar Registros'),
+            content: Text(
+              'Confirma la accion? no se puede deshacer.',
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('No'),
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              TextButton(
+                child: Text('Si'),
+                onPressed: () {
+                  CombinacionesProvider().sincronizarCombinaciones();
+                  CombinacionesProvider().cargarCombinaciones();
+                  Navigator.of(context).pop(true);
+                },
+              ),
+            ],
+          ),
+          useSafeArea: true,
+        );
+      },
+      icon: Icon(
+        Icons.sync_rounded,
+        color: Colors.white,
       ),
     );
   }
@@ -32,25 +66,23 @@ class Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     cp.cargarCombinaciones();
-    return Center(
-      child: SingleChildScrollView(
-        child: StreamBuilder(
-          stream: CombinacionesProvider.combinacionesStreamController,
-          builder: (BuildContext context, AsyncSnapshot snapshot) {
-            if (snapshot.hasData) {
-              final List<CombinacionModel> lista = snapshot.data;
-              return ListView.builder(
-                shrinkWrap: true,
-                itemCount: lista.length,
-                itemBuilder: (BuildContext context, int index) {
-                  CombinacionModel item = lista[index];
-                  return ItemsCombinaciones(item: item);
-                },
-              );
-            } else
-              return CircularProgressIndicator();
-          },
-        ),
+    return SingleChildScrollView(
+      child: StreamBuilder(
+        stream: CombinacionesProvider.combinacionesStreamController,
+        builder: (BuildContext context, AsyncSnapshot snapshot) {
+          if (snapshot.hasData) {
+            final List<CombinacionModel> lista = snapshot.data;
+            return ListView.builder(
+              shrinkWrap: true,
+              itemCount: lista.length,
+              itemBuilder: (BuildContext context, int index) {
+                CombinacionModel item = lista[index];
+                return ItemsCombinaciones(item: item);
+              },
+            );
+          } else
+            return CircularProgressIndicator();
+        },
       ),
     );
   }
@@ -83,7 +115,4 @@ class ItemsCombinaciones extends StatelessWidget {
   }
 }
 
-
-void syncItems()async{
-  
-}
+void syncItems() async {}

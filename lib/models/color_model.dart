@@ -5,29 +5,29 @@
 import 'dart:convert';
 
 class ColorModel {
-    ColorModel({
-        required this.color,
-        required this.descripcionColor,
-        required this.id,
-    });
+  ColorModel({
+    required this.color,
+    required this.descripcionColor,
+    this.id,
+  });
 
-    String color;
-    String descripcionColor;
-    String id;
+  String color;
+  String descripcionColor;
+  String? id;
 
-    factory ColorModel.fromJson(String str) => ColorModel.fromMap(json.decode(str));
+  factory ColorModel.fromJson(String str) => ColorModel.fromMap(json.decode(str));
 
-    String toJson() => json.encode(toMap());
+  String toJson() => json.encode(toMap());
 
-    factory ColorModel.fromMap(Map<String, dynamic> json) => ColorModel(
+  factory ColorModel.fromMap(Map<String, dynamic> json) => ColorModel(
         color: json["color"],
         descripcionColor: json["descripcionColor"],
-        id: json["id"],
-    );
+        id: json["id"] == null ? null : json["id"],
+      );
 
-    Map<String, dynamic> toMap() => {
+  Map<String, dynamic> toMap() => {
         "color": color,
         "descripcionColor": descripcionColor,
         "id": id,
-    };
+      };
 }

@@ -1,19 +1,17 @@
 import 'dart:io';
-import 'package:formas_colores/models/color_model.dart';
-import 'package:formas_colores/models/combinacion_model.dart';
-import 'package:formas_colores/models/forma_model.dart';
+import 'package:formas_colores/models/models.dart';
 import 'package:formas_colores/provider/data_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
-class Dbase {
+class LocalData {
   static Database? _database;
-  static final Dbase _db = new Dbase._();
+  static final LocalData _db = new LocalData._();
 
-  Dbase._();
+  LocalData._();
 
-  factory Dbase() {
+  factory LocalData() {
     return _db;
   }
 
@@ -48,16 +46,16 @@ class Dbase {
   Future<bool> guardaCombinacion(CombinacionModel combinacion) async {
     final _combinacion = await obtenerCombinacion(combinacion);
     if (_combinacion?.id != null) {
-      final res = await _modificaCombinacion(combinacion);
+      final res = await modificaCombinacion(combinacion);
       if (res > 0) return true;
     } else {
-      final res = await _agregaCombinacion(combinacion);
+      final res = await agregaCombinacion(combinacion);
       if (res > 0) return true;
     }
     return false;
   }
 
-  Future<int> _agregaCombinacion(CombinacionModel combinacion) async {
+  Future<int> agregaCombinacion(CombinacionModel combinacion) async {
     int res = 0;
 
     try {
@@ -72,13 +70,23 @@ class Dbase {
     return res;
   }
 
-  Future<int> _modificaCombinacion(CombinacionModel combinacionModel) async {
+  Future<int> modificaCombinacion(CombinacionModel combinacionModel) async {
     int res = 0;
 
     try {
       if (combinacionModel.id != null) {
         final db = await database;
-        res = await db.update('Usuarios', combinacionModel.toMap(), where: 'id = ?', whereArgs: [combinacionModel.id]);
+        res = await db.rawUpdate(
+          '''
+              UPDATE Combinaciones 
+              SET idFirebase = ?
+              WHERE id = ?
+          ''',
+          [
+            combinacionModel.idFirebase,
+            combinacionModel.id,
+          ],
+        );
       }
     } catch (errorsql) {
       print('error de bd MC: ${errorsql.toString()}');
@@ -112,9 +120,12 @@ class Dbase {
 }
 
 CombinacionModel convertResponse(dynamic res) {
-  print('Funcion: ${res["id"]} ${res["idColor"]} ${res["idForma"]} ${res["descripcion"]} ${res["idFirebase"]}');
-  final ColorModel colorModel = CombinacionesProvider().colores.firstWhere((element) => element.id == res["idColor"]);
-  final FormaModel formaModel = CombinacionesProvider().formas.firstWhere((element) => element.id == res["idForma"]);
+  CombinacionesProvider().cargarFormaColor();
+  final List<ColorModel> colores = CombinacionesProvider.listadoColores;
+  final List<FormaModel> formas = CombinacionesProvider.listadoformas;
+
+  final ColorModel colorModel = colores.firstWhere((element) => element.id == res["idColor"]);
+  final FormaModel formaModel = formas.firstWhere((element) => element.id == res["idForma"]);
   final String descripcion = res["descripcion"].toString();
   final String idFirebase = res["idFirebase"] == null ? '' : res["idFirebase"];
   return CombinacionModel(id: res["id"], color: colorModel, forma: formaModel, descripcion: descripcion, idFirebase: idFirebase);
