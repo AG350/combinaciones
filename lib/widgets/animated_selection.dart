@@ -19,24 +19,24 @@ class _AnimatedSelectionState extends State<AnimatedSelection> with SingleTicker
   void initState() {
     controller = new AnimationController(
       vsync: this,
-      duration: new Duration(milliseconds: 3000),
+      duration: new Duration(milliseconds: 1000),
     );
-    rotacion = Tween(begin: 0.0, end: 4 * Math.pi).animate(
+    rotacion = Tween(begin: 0.0, end: 0.5 * Math.pi).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Curves.easeInQuad,
+        curve: Curves.elasticOut,
       ),
     );
     agrandar = Tween(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: controller,
-        curve: Curves.easeOut,
+        curve: Curves.decelerate,
       ),
     );
     CombinacionesProvider.seleccionStreamController.listen((event) {
-      if (controller.status == AnimationStatus.completed ) {
-          controller.reset();
-        }
+      if (controller.status == AnimationStatus.completed) {
+        controller.reset();
+      }
       controller.forward();
     });
     super.initState();
