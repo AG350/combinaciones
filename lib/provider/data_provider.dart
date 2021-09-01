@@ -11,18 +11,6 @@ class CombinacionesProvider {
     descripcion: '',
   );
 
-  // List<ColorModel> colores() {
-  //   List<ColorModel> coloresList = [];
-  //   dbe.loadColors().then((value) => coloresList = value);
-  //   return coloresList;
-  // }
-
-  // List<FormaModel> formas() {
-  //   List<FormaModel> formasList = [];
-  //   dbe.loadForms().then((value) => formasList = value);
-  //   return formasList;
-  // }
-
   static List<CombinacionModel> listadoCombinaciones = [];
   static List<CombinacionModel> listadoSincronizado = [];
   static List<ColorModel> listadoColores = [];
@@ -59,15 +47,25 @@ class CombinacionesProvider {
   void sincronizarCombinaciones() async {
     listadoCombinaciones = await db.obtenerListaCombinaciones();
     for (var item in listadoCombinaciones) {
-      if (item.idFirebase != null) {
+      if (item.idFirebase == null) {
         item.idFirebase = await dbe.createCombinacion(item);
         db.modificaCombinacion(item);
       }
     }
+    cargarCombinaciones();
+  }
+
+  void limpiarSeleccion() async {
+    combinacionSeleccionada = new CombinacionModel(
+      color: new ColorModel(color: '', descripcionColor: '', id: ''),
+      forma: new FormaModel(descripcion: '', id: ''),
+      descripcion: '',
+    );
   }
 
   void cargarCombinaciones() async {
     listadoCombinaciones = await db.obtenerListaCombinaciones();
+    CombinacionesProvider().limpiarSeleccion();
     _combinacionesStreamController.add(listadoCombinaciones);
   }
 

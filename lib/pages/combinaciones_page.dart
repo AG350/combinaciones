@@ -8,8 +8,15 @@ class CombinacionesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Combinaciones'), actions: [Sincronizar()]),
-      body: SafeArea(child: Body()),
+      appBar: AppBar(
+        title: Text('Combinaciones'),
+        actions: [
+          Sincronizar(),
+        ],
+      ),
+      body: SafeArea(
+        child: Body(),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushReplacementNamed(context, 'home'),
         child: Icon(Icons.home),
@@ -115,4 +122,3 @@ class ItemsCombinaciones extends StatelessWidget {
   }
 }
 
-void syncItems() async {}

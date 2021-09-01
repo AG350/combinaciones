@@ -34,6 +34,6 @@ class CombinacionModel {
         "colores": color.toMap(),
         "formas": forma.toMap(),
         "descripcion": descripcion,
-        "idFirebase": idFirebase == '' ? '' : idFirebase,
+        "idFirebase": idFirebase == null ? null : idFirebase,
       };
 }

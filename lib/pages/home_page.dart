@@ -23,7 +23,7 @@ class HomePage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     FormularioSeleccion(),
-                    FormasSelector(),
+                    AnimatedSelection(),
                   ],
                 ),
               ),
@@ -56,15 +56,27 @@ class FormularioSeleccion extends StatelessWidget {
                   print(CombinacionesProvider.combinacionSeleccionada.descripcion);
                 }),
             SizedBox(height: 20),
-            FormButton(
-              text: 'Combinar',
-              onPress: () {
-                if (CombinacionesProvider.combinacionSeleccionada.descripcion != '') {
-                  dp.combinar();
-                  CombinacionesProvider().cargarCombinaciones();
-                  Navigator.pushReplacementNamed(context, 'combinaciones');
-                }
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                FormButton(
+                  text: 'Combinar',
+                  onPress: () {
+                    if (CombinacionesProvider.combinacionSeleccionada.descripcion != '') {
+                      dp.combinar();
+                      CombinacionesProvider().cargarCombinaciones();
+                      Navigator.pushReplacementNamed(context, 'combinaciones');
+                    }
+                  },
+                ),
+                FormButton(
+                  text: 'Ver Combinaciones',
+                  onPress: () {
+                    CombinacionesProvider().limpiarSeleccion();
+                    Navigator.pushReplacementNamed(context, 'combinaciones');
+                  },
+                )
+              ],
             )
           ],
         ),
@@ -164,6 +176,7 @@ class SelectionItem extends StatelessWidget {
                 child: Container(child: Text(e.descripcion)),
                 value: e,
                 onTap: () {
+                  
                   CombinacionesProvider.combinacionSeleccionada.forma = e;
                 },
               ),

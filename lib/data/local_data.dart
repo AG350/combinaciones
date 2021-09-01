@@ -127,6 +127,6 @@ CombinacionModel convertResponse(dynamic res) {
   final ColorModel colorModel = colores.firstWhere((element) => element.id == res["idColor"]);
   final FormaModel formaModel = formas.firstWhere((element) => element.id == res["idForma"]);
   final String descripcion = res["descripcion"].toString();
-  final String idFirebase = res["idFirebase"] == null ? '' : res["idFirebase"];
+  final String? idFirebase = res["idFirebase"] == null ? null : res["idFirebase"];
   return CombinacionModel(id: res["id"], color: colorModel, forma: formaModel, descripcion: descripcion, idFirebase: idFirebase);
 }
